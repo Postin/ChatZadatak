@@ -8,7 +8,7 @@ function register() {
 		data:JSON.stringify({username,password}),
 		contentType:"application/json",
 		success: function(data) {
-			alert(JSON.stringify(data));
+			alert(data);
 			if(data == undefined){
 				alert('error');
 			} else {
@@ -30,7 +30,7 @@ function login() {
 		data:JSON.stringify({username,password}),
 		contentType:"application/json",
 		success: function(user) {
-			alert(JSON.stringify(user));
+			alert(user);
 			if(user == undefined){
 				alert('error');
 			} else {
@@ -39,4 +39,23 @@ function login() {
 			}
 		}
 	});
+}
+
+function logout() {
+	let user = JSON.parse(localStorage.getItem('user'));
+	alert(user);
+	
+	$.ajax({
+		url:"rest/users/login",
+		type:"DELETE",
+		data:{user:user},
+		contentType:"application/json",
+		success: function(data) {
+			alert(data);
+		},
+		error: function() {
+			alert('error');
+		}
+	});
+	
 }
