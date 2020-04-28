@@ -8,14 +8,12 @@ function register() {
 		data:JSON.stringify({username,password}),
 		contentType:"application/json",
 		success: function(data) {
-			alert(data);
 			if(data == undefined){
 				alert('error');
 			} else {
-				alert('Registration successful!')
-				window.location.href = "login.html"
+				alert('Registration successful!' +' '+ data);
+				window.location.href = "login.html";
 			}
-			
 		}
 	});
 }
@@ -30,11 +28,10 @@ function login() {
 		data:JSON.stringify({username,password}),
 		contentType:"application/json",
 		success: function(user) {
-			alert(user);
 			if(user == undefined){
 				alert('error');
 			} else {
-				localStorage.setItem('user', JSON.stringify(user));
+				sessionStorage.setItem('user', JSON.stringify(user));
 				window.location.href = "index.html";
 			}
 		}
@@ -42,20 +39,22 @@ function login() {
 }
 
 function logout() {
-	let user = JSON.parse(localStorage.getItem('user'));
-	alert(user);
-	
+	let user = JSON.parse(sessionStorage.getItem('user'));
+	let username = user.username;
+
+	alert(username);
 	$.ajax({
-		url:"rest/users/login",
+		url:"rest/users/loggedIn/" + username,
 		type:"DELETE",
-		data:{user:user},
-		contentType:"application/json",
-		success: function(data) {
-			alert(data);
+		success: function() {
+			sessionStorage.removeItem('user');
+			window.location.href = 'login.html';	
 		},
 		error: function() {
 			alert('error');
 		}
 	});
-	
 }
+
+
+

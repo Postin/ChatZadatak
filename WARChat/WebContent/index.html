@@ -3,11 +3,39 @@
 <head>
 <meta charset="ISO-8859-1">
 <title>Insert title here</title>
-<script src="./js/register.js" type="text/javascript"></script>
+<script src="js/register.js" type="text/javascript"></script>
+<script src="js/showUsers.js" type="text/javascript"></script>
+<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet">
+<script
+  src="https://code.jquery.com/jquery-3.5.0.min.js"
+  integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ="
+  crossorigin="anonymous"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
 </head>
 <body>
-	<a href="register.html">Register here</a>
-	<br/>
+	<input type="button" value="Register" onClick="window.location='register.html';">
+	<input type="button" value= "Show Logged Users" onClick="showLoggedIn()">
+	<input type="button" value= "Show Registered Users" onClick="showRegistered()">
 	<input type="button" value="Logout" onClick="logout()">
+	
+	<table class="table" id="registeredTable" hidden="true" >
+	  <thead>
+	    <tr>
+	      <th scope="col">Username</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  </tbody>
+	</table>
+	
+	<table class="table" id="loggedInTable" hidden="true" >
+	  <thead>
+	    <tr>
+	      <th scope="col">Username</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  </tbody>
+	</table>
 </body>
 </html>

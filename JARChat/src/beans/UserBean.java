@@ -28,7 +28,7 @@ public class UserBean {
 	@Path("/register")
 	@Produces(MediaType.TEXT_PLAIN)
 	public User register(User user) {
-		System.out.println(user.getUsername()+" " + user.getPassword());
+		System.out.println(user.getUsername() +" "+ user.getPassword());
 		for(User u: users) {
 			if(u.getUsername().equals(user.getUsername())) {
 				return null;
@@ -40,19 +40,20 @@ public class UserBean {
 		u.setPassword(user.getPassword());
 		
 		users.add(u);
+		System.out.println(u);
 		return u;
 	}
 	
 	@POST
 	@Path("/login")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public User login(User user) {
 		System.out.println(user.getUsername()+" "+ user.getPassword());
 		for(User u:users) {
 			if(user.getUsername().equals(u.getUsername()) && user.getPassword().equals(u.getPassword())) {
 				loggedIn.add(user);
-				return user;
+				return u;
 			}
 		}
 		return null;
@@ -63,6 +64,7 @@ public class UserBean {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> loggedIn() {
+		System.out.println("loggedIn");
 		return loggedIn;
 	}
 	
@@ -76,8 +78,17 @@ public class UserBean {
 	
 	@DELETE
 	@Path("/loggedIn/{username}")
-	public User logout(@PathParam("username") String username) {
-		System.out.println(username);
-		return null;
+	@Consumes(MediaType.TEXT_PLAIN)
+	public void logout(@PathParam("username") String username) {
+		if(username == null)
+			return;
+		
+		for(int i = 0; i < loggedIn.size(); i++) {
+			if(loggedIn.get(i).getUsername().equals(username)) {
+				
+				loggedIn.remove(i);
+				System.out.println("Logging out user "+ username);
+			}
+		}
 	}
 }
