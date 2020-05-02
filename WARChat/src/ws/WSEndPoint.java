@@ -4,15 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Singleton;
-import javax.websocket.server.ServerEndpoint;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-
+import javax.websocket.server.ServerEndpoint;
 
 
 @Singleton
@@ -21,32 +21,27 @@ import javax.websocket.Session;
 public class WSEndPoint {
 	static List<Session> sessions = new ArrayList<Session>();
 	
+	
 	@OnOpen
 	public void onOpen(Session session) {
-		if(!sessions.contains(session)) {
+		if (!sessions.contains(session)) {
 			sessions.add(session);
 		}
 	}
 	
 	@OnMessage
-	public void echoTextMessage(Session session, String msg, boolean last) {
+	public void echoTextMessage(String msg) {
+		
 		try {
-			if(session.isOpen()) {
-				for(Session s: sessions) {
-					if(s.getId().equals(session.getId())) {
-						s.getBasicRemote().sendText(msg,last);
-					}
-				}
+	        for (Session s : sessions) {
+	        	System.out.println("WSEndPoint: " + msg);
+        		s.getBasicRemote().sendText(msg);
 			}
 		} catch (IOException e) {
-			try {
-				session.close();
-			} catch (IOException e2) {
-				e2.printStackTrace();
-			}
+			e.printStackTrace();
 		}
 	}
-	
+
 	@OnClose
 	public void close(Session session) {
 		sessions.remove(session);
@@ -57,5 +52,5 @@ public class WSEndPoint {
 		sessions.remove(session);
 		t.printStackTrace();
 	}
-	
+
 }

@@ -3,8 +3,10 @@ package beans;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.servlet.ServletContext;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -12,8 +14,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import dao.UserDao;
 import models.User;
 
 @Stateless
@@ -21,15 +25,23 @@ import models.User;
 @LocalBean
 public class UserBean {
 
-	private List<User> users = new ArrayList<User>();
-	private List<User> loggedIn = new ArrayList<User>();
+	@Context
+	ServletContext context;
+	
+	@PostConstruct
+	public void init() {
+		if(context.getAttribute("userDao") == null) {
+			context.setAttribute("userDao", new UserDao());
+		}
+	}
 
 	@POST
 	@Path("/register")
 	@Produces(MediaType.TEXT_PLAIN)
 	public User register(User user) {
-		System.out.println(user.getUsername() +" "+ user.getPassword());
-		for(User u: users) {
+		UserDao userDao = (UserDao) context.getAttribute("userDao");
+		
+		for(User u: userDao.getUsers()) {
 			if(u.getUsername().equals(user.getUsername())) {
 				return null;
 			}
@@ -39,7 +51,7 @@ public class UserBean {
 		u.setUsername(user.getUsername());
 		u.setPassword(user.getPassword());
 		
-		users.add(u);
+		userDao.getUsers().add(u);
 		System.out.println(u);
 		return u;
 	}
@@ -49,10 +61,13 @@ public class UserBean {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public User login(User user) {
-		System.out.println(user.getUsername()+" "+ user.getPassword());
-		for(User u:users) {
+		UserDao userDao = (UserDao) context.getAttribute("userDao");
+		
+		for(User u:userDao.getUsers()) {
 			if(user.getUsername().equals(u.getUsername()) && user.getPassword().equals(u.getPassword())) {
-				loggedIn.add(user);
+				userDao.getLoggedIn().add(user);
+				System.out.println(user.getUsername());
+				context.setAttribute("userDao", userDao);
 				return u;
 			}
 		}
@@ -64,8 +79,8 @@ public class UserBean {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> loggedIn() {
-		System.out.println("loggedIn");
-		return loggedIn;
+		UserDao userDao = (UserDao)context.getAttribute("userDao");
+		return userDao.getLoggedIn();
 	}
 	
 	@GET
@@ -73,7 +88,8 @@ public class UserBean {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<User> registered() {
-		return users;
+		UserDao userDao = (UserDao)context.getAttribute("userDao");
+		return userDao.getUsers();
 	}
 	
 	@DELETE
@@ -83,10 +99,12 @@ public class UserBean {
 		if(username == null)
 			return;
 		
-		for(int i = 0; i < loggedIn.size(); i++) {
-			if(loggedIn.get(i).getUsername().equals(username)) {
+		UserDao userDao = (UserDao)context.getAttribute("userDao");
+		
+		for(int i = 0; i < userDao.getLoggedIn().size(); i++) {
+			if(userDao.getLoggedIn().get(i).getUsername().equals(username)) {
 				
-				loggedIn.remove(i);
+				userDao.getLoggedIn().remove(i);
 				System.out.println("Logging out user "+ username);
 			}
 		}
